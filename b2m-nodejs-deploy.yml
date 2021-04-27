@@ -1,0 +1,39 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: b2m-nodejs
+  name: b2m-nodejs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: b2m-nodejs
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: b2m-nodejs
+    spec:
+      containers:
+      - image: rszypulka/b2m-nodejs-delay
+        imagePullPolicy: Always
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: 3001
+            scheme: HTTP
+          initialDelaySeconds: 3
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        name: node-prom
+        ports:
+        - containerPort: 3001
+          protocol: TCP
